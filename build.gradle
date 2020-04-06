@@ -1,0 +1,97 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
+plugins {
+    id 'java'
+}
+
+group = 'dbdiff'
+version = '0.0.1-SNAPSHOT'
+
+compileJava.options.encoding = "UTF-8"
+
+project.ext {
+    lombokVersion = "1.18.12"
+    logbackVersion = "1.3.0-alpha5"
+    slf4jVersion = "2.0.0-alpha1"
+    groovyVersion = "2.5.2"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_12
+    targetCompatibility = JavaVersion.VERSION_12
+}
+
+jar.doFirst {
+    manifest {
+        //noinspection GroovyAssignabilityCheck
+        attributes("Manifest-Version": "1.0",
+                "Main-Class": "dbdiff.Application",
+                "Class-Path": configurations.compile.collect { saveDep(it, buildDir.getAbsolutePath()) }.join(' '))
+    }
+}
+
+task migResources(dependsOn: 'jar') {
+    def libs = file(buildDir.getAbsolutePath() + File.separator + "libs")
+    if (!libs.exists()) {
+        libs.mkdirs()
+    }
+    file(projectDir.absolutePath + File.separator + "src/main/resources")
+            .listFiles({ file -> file.getName().endsWith(".properties") ||
+                    file.getName().endsWith(".csv") || file.getName().endsWith(".xml") ||
+                    file.getName().endsWith(".groovy")} as FileFilter).each { f ->
+        def file = new File(libs, f.getName())
+        if (!file.exists()) {
+            OutputStream out = new FileOutputStream(file)
+            Files.copy(Paths.get(f.getAbsolutePath()), out)
+            out.close()
+        }
+    }
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    compile "org.codehaus.groovy:groovy-templates:${groovyVersion}"
+    compile group: 'ch.qos.logback', name: 'logback-core', version: "${logbackVersion}"
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
+    compile group: 'org.slf4j', name: 'slf4j-api', version: "${slf4jVersion}"
+
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def saveDep(it, String path) {
+    def libs = file(path + File.separator + "libs")
+    if (!libs.exists()) {
+        libs.mkdirs();
+    }
+    def dirName = "lib"
+    def dir = file(path + File.separator + "libs" + File.separator + dirName)
+    if (!dir.exists()) dir.mkdirs()
+    if (it instanceof File) {
+        Files.copy(Paths.get(it.absolutePath), new FileOutputStream(new File(dir, it.name)))
+    }
+    dirName + "/" + it.name
+}

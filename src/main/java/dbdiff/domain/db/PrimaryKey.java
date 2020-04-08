@@ -1,13 +1,12 @@
-package dbdiff.domain;
+package dbdiff.domain.db;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
 @EqualsAndHashCode(callSuper = true)
-public class ForeignKey extends Constraint {
-
-    public ForeignKey(String name) {
+@Data
+public class PrimaryKey extends Constraint {
+    public PrimaryKey(String name) {
         super(name);
     }
 }

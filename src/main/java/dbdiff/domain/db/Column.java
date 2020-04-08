@@ -1,6 +1,5 @@
-package dbdiff.domain;
+package dbdiff.domain.db;
 
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

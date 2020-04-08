@@ -1,4 +1,4 @@
-package dbdiff.domain;
+package dbdiff.domain.db;
 
 public interface DatabaseObject {
 }

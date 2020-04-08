@@ -17,6 +17,7 @@ project.ext {
     groovyVersion = "2.5.2"
     junitVersion = "5.6.1"
     hamcrestVersion = "2.2"
+    snakeyamlVersion = "1.26"
 }
 
 compileJava.options.encoding = "UTF-8"
@@ -36,22 +37,25 @@ jar.doFirst {
     }
 }
 
-task migResources(dependsOn: 'jar') {
+task copyResources(dependsOn: 'jar') {
     def libs = file(buildDir.getAbsolutePath() + File.separator + "libs")
     if (!libs.exists()) {
         libs.mkdirs()
     }
     file(projectDir.absolutePath + File.separator + "src/main/resources")
-            .listFiles({ file -> file.getName().endsWith(".properties") ||
-                    file.getName().endsWith(".csv") || file.getName().endsWith(".xml") ||
-                    file.getName().endsWith(".groovy")} as FileFilter).each { f ->
-        def file = new File(libs, f.getName())
-        if (!file.exists()) {
-            OutputStream out = new FileOutputStream(file)
-            Files.copy(Paths.get(f.getAbsolutePath()), out)
-            out.close()
-        }
-    }
+            .listFiles({ file ->
+                file.getName().endsWith(".properties") ||
+                        file.getName().endsWith(".csv") || file.getName().endsWith(".xml") ||
+                        file.getName().endsWith(".groovy") || file.getName().endsWith(".yml")
+            } as FileFilter)
+            .each { f ->
+                def file = new File(libs, f.getName())
+                if (!file.exists()) {
+                    OutputStream out = new FileOutputStream(file)
+                    Files.copy(Paths.get(f.getAbsolutePath()), out)
+                    out.close()
+                }
+            }
 }
 
 configurations {
@@ -78,6 +82,7 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-core', version: "${logbackVersion}"
     compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
     compile group: 'org.slf4j', name: 'slf4j-api', version: "${slf4jVersion}"
+    compile "org.yaml:snakeyaml:${snakeyamlVersion}"
 
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testCompile "org.junit.jupiter:junit-jupiter:${junitVersion}"

@@ -1,5 +1,6 @@
 package dbdiff.service;
 
+import dbdiff.domain.conf.Config;
 import dbdiff.domain.db.Database;
 import dbdiff.domain.db.DatabaseObject;
 import dbdiff.parser.ModelParser;
@@ -16,9 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Comparator {
     private final ModelParser parser;
-
-    private static final String OLD_MODEL_NAME = "old.ddl";
-    private static final String NEW_MODEL_NAME = "current.ddl";
+    private final Config config;
 
     private void checkFileExists(String path) {
         File file = new File(path);
@@ -28,14 +27,14 @@ public class Comparator {
     }
 
     private void check() {
-        checkFileExists(OLD_MODEL_NAME);
-        checkFileExists(NEW_MODEL_NAME);
+        checkFileExists(config.getModels().getOld());
+        checkFileExists(config.getModels().getCurrent());
     }
 
     public void run() {
         check();
-        Database old = formDb(OLD_MODEL_NAME);
-        Database current = formDb(NEW_MODEL_NAME);
+        Database old = formDb(config.getModels().getOld());
+        Database current = formDb(config.getModels().getCurrent());
     }
 
     @SneakyThrows

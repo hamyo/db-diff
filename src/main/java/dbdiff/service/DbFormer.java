@@ -9,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 public class DbFormer {
     private List<DatabaseObject> objects;
+
     public Database form() {
         return new Database();
     }

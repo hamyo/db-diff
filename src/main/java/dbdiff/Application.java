@@ -3,6 +3,7 @@ package dbdiff;
 import dbdiff.domain.conf.Config;
 import dbdiff.parser.DbZos;
 import dbdiff.service.Comparator;
+import dbdiff.service.DbFormer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
@@ -23,7 +24,7 @@ public class Application {
         try {
             Config config = getConfigFromFile();
             Config argsConfig = getConfigFromArgs(args);
-            Comparator comparator = new Comparator(new DbZos(), config.merge(argsConfig));
+            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), config.merge(argsConfig));
             comparator.run();
         } catch (Exception e) {
             log.error("Critical error.", e);

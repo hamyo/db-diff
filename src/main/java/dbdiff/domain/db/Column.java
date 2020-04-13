@@ -1,5 +1,6 @@
 package dbdiff.domain.db;
 
+import dbdiff.utils.Strings;
 import lombok.Getter;
 
 @Getter
@@ -21,6 +22,12 @@ public class Column implements DatabaseObject {
         Column column = new Column();
         column.desc = desc;
         return column;
+    }
+
+    public void merge(Column other) {
+        this.desc = Strings.concat(this.desc, other.desc);
+        this.name = Strings.concat(this.name, other.name);
+        this.type = Strings.concat(this.type, other.type);
     }
 
 }

@@ -18,6 +18,7 @@ project.ext {
     junitVersion = "5.6.1"
     hamcrestVersion = "2.2"
     snakeyamlVersion = "1.26"
+    apacheCommonsVersion = "3.10"
 }
 
 compileJava.options.encoding = "UTF-8"
@@ -83,6 +84,7 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: "${logbackVersion}"
     compile group: 'org.slf4j', name: 'slf4j-api', version: "${slf4jVersion}"
     compile "org.yaml:snakeyaml:${snakeyamlVersion}"
+    compile "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
 
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testCompile "org.junit.jupiter:junit-jupiter:${junitVersion}"

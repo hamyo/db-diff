@@ -1,7 +1,9 @@
 package dbdiff.domain.db;
 
+import dbdiff.utils.Strings;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -10,9 +12,11 @@ public class Table implements DatabaseObject {
     String scheme;
     String name;
     String desc;
-    List<Column> columns;
+    List<Column> columns = new ArrayList<>();
+    List<Index> indiсes = new ArrayList<>();
+
     PrimaryKey primaryKey;
-    List<ForeignKey> foreignKeys;
+    List<ForeignKey> foreignKeys = new ArrayList<>();
 
     private Table() {}
 
@@ -28,5 +32,16 @@ public class Table implements DatabaseObject {
         table.scheme = scheme;
         table.name = name;
         return table;
+    }
+
+    public void merge(Table other) {
+        this.desc = Strings.concat(this.desc, other.desc);
+        this.name = Strings.concat(this.name, other.name);
+        this.tablespace = Strings.concat(this.tablespace, other.tablespace);
+        this.scheme = Strings.concat(this.scheme, other.scheme);
+    }
+
+    public void setPrimaryKey(PrimaryKey primaryKey) {
+        this.primaryKey = primaryKey;
     }
 }

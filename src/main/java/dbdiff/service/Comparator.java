@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Comparator {
     private final ModelParser parser;
+    private final DbFormer dbFormer;
     private final Config config;
 
     private void checkFileExists(String path) {
@@ -40,7 +41,7 @@ public class Comparator {
     @SneakyThrows
     private Database formDb(String path) {
         List<DatabaseObject> objects = parser.parse(Files.lines(Paths.get(path), StandardCharsets.UTF_8));
-        return new DbFormer(objects).form();
+        return dbFormer.form(objects);
     }
 
     private void compare(Database old, Database current) {

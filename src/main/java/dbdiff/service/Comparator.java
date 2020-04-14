@@ -1,18 +1,20 @@
 package dbdiff.service;
 
 import dbdiff.domain.conf.Config;
-import dbdiff.domain.db.Database;
-import dbdiff.domain.db.DatabaseObject;
+import dbdiff.domain.db.*;
+import dbdiff.domain.diff.Difference;
 import dbdiff.parser.ModelParser;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 @AllArgsConstructor
 public class Comparator {
@@ -20,22 +22,15 @@ public class Comparator {
     private final DbFormer dbFormer;
     private final Config config;
 
-    private void checkFileExists(String path) {
-        File file = new File(path);
-        if (!file.exists()) {
-            throw new IllegalArgumentException(MessageFormat.format("File {0} not exists", path));
-        }
-    }
-
-    private void check() {
-        checkFileExists(config.getModels().getOld());
-        checkFileExists(config.getModels().getCurrent());
-    }
-
     public void run() {
-        check();
         Database old = formDb(config.getModels().getOld());
         Database current = formDb(config.getModels().getCurrent());
+        List<Difference> diff = compare(old, current);
+        createReport(diff);
+    }
+
+    private void createReport(List<Difference> diff) {
+
     }
 
     @SneakyThrows
@@ -44,8 +39,54 @@ public class Comparator {
         return dbFormer.form(objects);
     }
 
-    private void compare(Database old, Database current) {
+    List<Difference> compare(Database old, Database current) {
+        Map<String, Table> oldTables = old.getTables().stream()
+                .collect(toMap(Table::getName, Function.identity()));
+        return current.getTables().stream()
+                .map(curTable -> {
+                    Table oldTable = oldTables.get(curTable.getName());
+                    if (oldTable == null) {
+                        return Difference.ofNew(curTable);
+                    } else {
+                        Optional<Table> difTable = compareTable(oldTable, curTable);
+                        return difTable.isEmpty() ? null : Difference.ofEdit(difTable.get());
+                    }
+                }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
+    private Optional<Table> compareTable(Table oldTable, Table curTable) {
+        Table diff = Table.of(oldTable);
+
+        diff.getIndices().addAll(compareIndices(oldTable.getIndices(), curTable.getIndices()));
+        diff.getForeignKeys().addAll(compareForeignKeys(oldTable.getForeignKeys(), curTable.getForeignKeys()));
+        diff.getColumns().addAll(compareColumns(oldTable.getColumns(), curTable.getColumns()));
+
+        return diff.isEmpty() ? Optional.empty() : Optional.of(diff);
+    }
+
+    private List<Index> compareIndices(List<Index> oldIndices, List<Index> curIndices) {
+        Set<Index> oldIndicesSet = new HashSet<>(oldIndices);
+        return curIndices.stream()
+                .filter(index -> !oldIndicesSet.contains(index))
+                .collect(Collectors.toList());
+    }
+
+    private List<ForeignKey> compareForeignKeys(List<ForeignKey> oldKeys, List<ForeignKey> curKeys) {
+        Set<ForeignKey> oldKeysSet = new HashSet<>(oldKeys);
+        return curKeys.stream()
+                .filter(key -> !oldKeysSet.contains(key))
+                .collect(Collectors.toList());
+    }
+
+    private List<Column> compareColumns(List<Column> oldColumns, List<Column> curColumns) {
+        Set<String> oldColumnNames = oldColumns.stream()
+                .map(Column::getName)
+                .collect(Collectors.toSet());
+
+        return curColumns.stream()
+                .filter(column -> !oldColumnNames.contains(column.getName()))
+                .collect(Collectors.toList());
     }
 
 }

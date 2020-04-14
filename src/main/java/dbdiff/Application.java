@@ -2,13 +2,16 @@ package dbdiff;
 
 import dbdiff.domain.conf.Config;
 import dbdiff.parser.DbZos;
+import dbdiff.parser.ModelParser;
 import dbdiff.service.Comparator;
 import dbdiff.service.DbFormer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,12 +25,27 @@ public class Application {
 
     public static void main(String[] args) {
         try {
-            Config config = getConfigFromFile();
-            Config argsConfig = getConfigFromArgs(args);
-            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), config.merge(argsConfig));
+            Config config = getConfig(args);
+            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), config);
             comparator.run();
         } catch (Exception e) {
             log.error("Critical error.", e);
+        }
+    }
+
+    private static Config getConfig(String[] args) {
+        Config fileConfig = getConfigFromFile();
+        Config argsConfig = getConfigFromArgs(args);
+        Config config = fileConfig.merge(argsConfig);
+        checkFileExists(config.getModels().getCurrent());
+        checkFileExists(config.getModels().getOld());
+        return config;
+    }
+
+    private static void checkFileExists(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            throw new IllegalArgumentException(MessageFormat.format("File {0} not exists", path));
         }
     }
 

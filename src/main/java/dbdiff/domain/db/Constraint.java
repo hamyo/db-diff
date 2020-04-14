@@ -1,8 +1,8 @@
 package dbdiff.domain.db;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class Constraint implements DatabaseObject {
     String name;
 

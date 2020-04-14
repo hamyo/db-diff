@@ -3,17 +3,15 @@ package dbdiff.service;
 import dbdiff.domain.AppException;
 import dbdiff.domain.UndefinedBehaviorException;
 import dbdiff.domain.db.*;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
 
-@AllArgsConstructor
 public class DbFormer {
     public Database form(List<DatabaseObject> dbObjects) {
         Database db = new Database();
-        for(DatabaseObject dbObject : dbObjects) {
+        for (DatabaseObject dbObject : dbObjects) {
             handleOne(dbObject, db);
         }
         return db;
@@ -35,7 +33,9 @@ public class DbFormer {
 
     private void handleForeignKey(ForeignKey fKey, Database db) {
         getLastTable(db).ifPresentOrElse(lastTable -> lastTable.getForeignKeys().add(fKey),
-                () -> { throw new UndefinedBehaviorException(fKey.toString()); });
+                () -> {
+                    throw new UndefinedBehaviorException(fKey.toString());
+                });
     }
 
     private void handlePrimaryKey(PrimaryKey pKey, Database db) {
@@ -46,12 +46,16 @@ public class DbFormer {
                         lastTable.setPrimaryKey(pKey);
                     }
                 },
-                () -> { throw new UndefinedBehaviorException(pKey.toString()); });
+                () -> {
+                    throw new UndefinedBehaviorException(pKey.toString());
+                });
     }
 
     private void handleIndex(Index index, Database db) {
-        getLastTable(db).ifPresentOrElse(lastTable -> lastTable.getIndiсes().add(index),
-                () -> { throw new UndefinedBehaviorException(index.toString()); });
+        getLastTable(db).ifPresentOrElse(lastTable -> lastTable.getIndices().add(index),
+                () -> {
+                    throw new UndefinedBehaviorException(index.toString());
+                });
     }
 
     private void handleTable(Table table, Database db) {

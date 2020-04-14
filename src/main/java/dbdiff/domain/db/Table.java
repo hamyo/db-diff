@@ -13,12 +13,21 @@ public class Table implements DatabaseObject {
     String name;
     String desc;
     List<Column> columns = new ArrayList<>();
-    List<Index> indiсes = new ArrayList<>();
+    List<Index> indices = new ArrayList<>();
 
     PrimaryKey primaryKey;
     List<ForeignKey> foreignKeys = new ArrayList<>();
 
     private Table() {}
+
+    public static Table of(Table table) {
+        Table res = new Table();
+        res.tablespace = table.tablespace;
+        res.desc = table.desc;
+        res.name = table.name;
+        res.scheme = table.scheme;
+        return res;
+    }
 
     public static Table ofDesc(String desc, String tablespace) {
         Table table = new Table();
@@ -43,5 +52,9 @@ public class Table implements DatabaseObject {
 
     public void setPrimaryKey(PrimaryKey primaryKey) {
         this.primaryKey = primaryKey;
+    }
+
+    public boolean isEmpty() {
+        return indices.isEmpty() && foreignKeys.isEmpty() && columns.isEmpty();
     }
 }

@@ -7,6 +7,7 @@ import dbdiff.service.Comparator;
 import dbdiff.service.DbFormer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -37,9 +38,23 @@ public class Application {
         Config fileConfig = getConfigFromFile();
         Config argsConfig = getConfigFromArgs(args);
         Config config = fileConfig.merge(argsConfig);
+
         checkFileExists(config.getModels().getCurrent());
         checkFileExists(config.getModels().getOld());
+        checkRequiredParams(config);
         return config;
+    }
+
+    private static void checkRequiredParams(Config config) {
+        checkNotEmpty(config.getReportPath(), "reportPath");
+        checkNotEmpty(config.getModels().getCurrent(), "model:current");
+        checkNotEmpty(config.getModels().getOld(), "model:old");
+    }
+
+    private static void checkNotEmpty(String param, String paramName) {
+        if (StringUtils.isEmpty(param)) {
+            throw new IllegalArgumentException(MessageFormat.format("Params {0} is empty", paramName));
+        }
     }
 
     private static void checkFileExists(String path) {

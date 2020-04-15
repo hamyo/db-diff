@@ -7,7 +7,7 @@ public class Strings {
         }
 
         if (str2 == null) {
-            return str2;
+            return str1;
         }
 
         return str1.concat(" " + str2);

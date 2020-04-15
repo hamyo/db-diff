@@ -8,7 +8,6 @@ import dbdiff.domain.diff.StateChange;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.poi.xwpf.usermodel.*;
-import org.codehaus.groovy.control.messages.Message;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STNumberFormat;
@@ -39,7 +38,7 @@ public class WordReport implements ReportCreater {
                 .collect(Collectors.toList());
         handleDifferences(differences, report, EDITED_TABLE_TEXT);
 
-        try(FileOutputStream out = new FileOutputStream(filePath)) {
+        try (FileOutputStream out = new FileOutputStream(filePath)) {
             report.write(out);
         }
     }
@@ -73,7 +72,7 @@ public class WordReport implements ReportCreater {
             XWPFNumbering numbering = report.createNumbering();
             BigInteger abstractNumID = numbering.addAbstractNum(abstractNum);
             BigInteger numId = numbering.addNum(abstractNumID);
-            indices.forEach( index -> {
+            indices.forEach(index -> {
                 XWPFParagraph bulletList = report.createParagraph();
                 XWPFRun item = bulletList.createRun();
                 //run.setFontFamily(ARIAL);

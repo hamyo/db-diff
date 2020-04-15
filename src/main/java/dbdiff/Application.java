@@ -2,7 +2,6 @@ package dbdiff;
 
 import dbdiff.domain.conf.Config;
 import dbdiff.parser.DbZos;
-import dbdiff.parser.ModelParser;
 import dbdiff.report.WordReport;
 import dbdiff.service.Comparator;
 import dbdiff.service.DbFormer;

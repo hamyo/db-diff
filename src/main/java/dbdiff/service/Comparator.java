@@ -4,6 +4,7 @@ import dbdiff.domain.conf.Config;
 import dbdiff.domain.db.*;
 import dbdiff.domain.diff.Difference;
 import dbdiff.parser.ModelParser;
+import dbdiff.report.ReportCreater;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -20,13 +21,14 @@ import static java.util.stream.Collectors.toMap;
 public class Comparator {
     private final ModelParser parser;
     private final DbFormer dbFormer;
+    private final ReportCreater reportCreater;
     private final Config config;
 
     public void run() {
         Database old = formDb(config.getModels().getOld());
         Database current = formDb(config.getModels().getCurrent());
         List<Difference> diff = compare(old, current);
-        createReport(diff);
+        reportCreater.createAndSave(diff);
     }
 
     private void createReport(List<Difference> diff) {

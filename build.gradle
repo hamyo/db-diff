@@ -19,6 +19,7 @@ project.ext {
     hamcrestVersion = "2.2"
     snakeyamlVersion = "1.26"
     apacheCommonsVersion = "3.10"
+    apachePoi = "4.1.2"
 }
 
 compileJava.options.encoding = "UTF-8"
@@ -85,6 +86,8 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: "${slf4jVersion}"
     compile "org.yaml:snakeyaml:${snakeyamlVersion}"
     compile "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
+    compile "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: "${apachePoi}"
 
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testCompile "org.junit.jupiter:junit-jupiter:${junitVersion}"

@@ -3,6 +3,7 @@ package dbdiff;
 import dbdiff.domain.conf.Config;
 import dbdiff.parser.DbZos;
 import dbdiff.parser.ModelParser;
+import dbdiff.report.WordReport;
 import dbdiff.service.Comparator;
 import dbdiff.service.DbFormer;
 import lombok.SneakyThrows;
@@ -27,7 +28,7 @@ public class Application {
     public static void main(String[] args) {
         try {
             Config config = getConfig(args);
-            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), config);
+            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), new WordReport(config.getReportPath()), config);
             comparator.run();
         } catch (Exception e) {
             log.error("Critical error.", e);

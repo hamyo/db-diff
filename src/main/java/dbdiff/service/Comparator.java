@@ -31,10 +31,6 @@ public class Comparator {
         reportCreater.createAndSave(diff);
     }
 
-    private void createReport(List<Difference> diff) {
-
-    }
-
     @SneakyThrows
     private Database formDb(String path) {
         List<DatabaseObject> objects = parser.parse(Files.lines(Paths.get(path), StandardCharsets.UTF_8));
@@ -75,9 +71,11 @@ public class Comparator {
     }
 
     private List<ForeignKey> compareForeignKeys(List<ForeignKey> oldKeys, List<ForeignKey> curKeys) {
-        Set<ForeignKey> oldKeysSet = new HashSet<>(oldKeys);
+        Set<String> oldKeyNames = oldKeys.stream()
+                .map(Constraint::getName)
+                .collect(Collectors.toSet());
         return curKeys.stream()
-                .filter(key -> !oldKeysSet.contains(key))
+                .filter(key -> !oldKeyNames.contains(key.getName()))
                 .collect(Collectors.toList());
     }
 

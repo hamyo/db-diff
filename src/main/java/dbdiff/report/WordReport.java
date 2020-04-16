@@ -1,6 +1,7 @@
 package dbdiff.report;
 
 import dbdiff.domain.db.Column;
+import dbdiff.domain.db.Constraint;
 import dbdiff.domain.db.Index;
 import dbdiff.domain.db.Table;
 import dbdiff.domain.diff.Difference;
@@ -53,8 +54,10 @@ public class WordReport implements ReportCreater {
     }
 
     private void handleTable(Table table, XWPFDocument report) {
+        createTableDesc(table, report);
         createColumnsTable(table.getColumns(), report);
         createIndicesDesc(table.getIndices(), report);
+        createConstraintsDesc(table.getConstraints(), report);
     }
 
     private void createIndicesDesc(List<Index> indices, XWPFDocument report) {
@@ -75,9 +78,9 @@ public class WordReport implements ReportCreater {
             indices.forEach(index -> {
                 XWPFParagraph bulletList = report.createParagraph();
                 XWPFRun item = bulletList.createRun();
-                //run.setFontFamily(ARIAL);
-                //run.setFontSize(10);
-                run.setText(MessageFormat.format("{0}.{1}", index.getScheme(), index.getName()));
+                //item.setFontFamily(ARIAL);
+                //item.setFontSize(10);
+                item.setText(MessageFormat.format("{0}.{1}", index.getScheme(), index.getName()));
                 bulletList.setNumID(numId);
             });
             /*XWPFNumbering numbering = report.createNumbering();
@@ -87,15 +90,45 @@ public class WordReport implements ReportCreater {
         }
     }
 
+    private void createConstraintsDesc(List<Constraint> constraints, XWPFDocument report) {
+        if (!constraints.isEmpty()) {
+            XWPFParagraph paragraph = report.createParagraph();
+            XWPFRun run = paragraph.createRun();
+            run.setText("Ограничения:");
+
+            CTAbstractNum cTAbstractNum = CTAbstractNum.Factory.newInstance();
+            cTAbstractNum.setAbstractNumId(BigInteger.valueOf(0));
+            CTLvl cTLvl = cTAbstractNum.addNewLvl();
+            cTLvl.addNewNumFmt().setVal(STNumberFormat.BULLET);
+
+            XWPFAbstractNum abstractNum = new XWPFAbstractNum(cTAbstractNum);
+            XWPFNumbering numbering = report.createNumbering();
+            BigInteger abstractNumID = numbering.addAbstractNum(abstractNum);
+            BigInteger numId = numbering.addNum(abstractNumID);
+            constraints.forEach(constraint -> {
+                XWPFParagraph bulletList = report.createParagraph();
+                XWPFRun item = bulletList.createRun();
+                item.setText(MessageFormat.format("{0} - {1}", constraint.getName(), constraint.getTypeName()));
+                bulletList.setNumID(numId);
+            });
+        }
+    }
+
     private void createColumnsTable(List<Column> columns, XWPFDocument report) {
-        XWPFTable table = report.createTable();
-        createColumnsHeader(table);
+        XWPFTable docTable = report.createTable();
+        createColumnsHeader(docTable);
         columns.forEach(column -> {
-            XWPFTableRow row = table.createRow();
+            XWPFTableRow row = docTable.createRow();
             row.getCell(0).setText(column.getName());
             row.getCell(1).setText(column.getType());
             row.getCell(2).setText(column.getDesc());
         });
+    }
+
+    private void createTableDesc(Table table, XWPFDocument report) {
+        XWPFParagraph paragraph = report.createParagraph();
+        XWPFRun run = paragraph.createRun();
+        run.setText(MessageFormat.format("{0}.{1} ({2})", table.getScheme(), table.getName(), table.getDesc()));
     }
 
     private void createColumnsHeader(XWPFTable table) {

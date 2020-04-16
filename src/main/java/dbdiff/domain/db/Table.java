@@ -54,6 +54,15 @@ public class Table implements DatabaseObject {
         this.primaryKey = primaryKey;
     }
 
+    public List<Constraint> getConstraints() {
+        List<Constraint> constraints = new ArrayList<>(foreignKeys);
+        if (primaryKey != null) {
+            constraints.add(primaryKey);
+        }
+
+        return constraints;
+    }
+
     public boolean isEmpty() {
         return indices.isEmpty() && foreignKeys.isEmpty() && columns.isEmpty();
     }

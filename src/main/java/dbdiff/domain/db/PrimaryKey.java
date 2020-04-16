@@ -9,4 +9,9 @@ public class PrimaryKey extends Constraint {
     public PrimaryKey(String name) {
         super(name);
     }
+
+    @Override
+    public String getTypeName() {
+        return "PRIMARY KEY";
+    }
 }

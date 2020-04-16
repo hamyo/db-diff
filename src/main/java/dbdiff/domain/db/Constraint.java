@@ -9,4 +9,8 @@ public class Constraint implements DatabaseObject {
     protected Constraint(String name) {
         this.name = name;
     }
+
+    public String getTypeName() {
+        return "CONSTRAINT";
+    }
 }

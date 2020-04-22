@@ -115,14 +115,16 @@ public class WordReport implements ReportCreater {
     }
 
     private void createColumnsTable(List<Column> columns, XWPFDocument report) {
-        XWPFTable docTable = report.createTable();
-        createColumnsHeader(docTable);
-        columns.forEach(column -> {
-            XWPFTableRow row = docTable.createRow();
-            row.getCell(0).setText(column.getName());
-            row.getCell(1).setText(column.getType());
-            row.getCell(2).setText(column.getDesc());
-        });
+        if (!columns.isEmpty()) {
+            XWPFTable docTable = report.createTable();
+            createColumnsHeader(docTable);
+            columns.forEach(column -> {
+                XWPFTableRow row = docTable.createRow();
+                row.getCell(0).setText(column.getName());
+                row.getCell(1).setText(column.getType());
+                row.getCell(2).setText(column.getDesc());
+            });
+        }
     }
 
     private void createTableDesc(Table table, XWPFDocument report) {

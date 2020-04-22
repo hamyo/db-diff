@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 @Slf4j
 public class DbZos implements ModelParser {
-    private static final Pattern TABLE_DESC_REG_EXP = Pattern.compile("^-{2}\\s*(?<desc>[\\w|[ЁёА-я]|\\s]+)\\s*:\\s*(?<tablespace>[A-Za-z]+)$");
-    private static final Pattern COLUMN_DESC_REG_EXP = Pattern.compile("^-{2}\\s*(?<desc>[\\w|[ЁёА-я]|\\s]+)\\s*$");
+    private static final Pattern TABLE_DESC_REG_EXP = Pattern.compile("^-{2}\\s*(?<desc>.+)\\s*:\\s*(?<tablespace>[A-Za-z]+)$");
+    private static final Pattern COLUMN_DESC_REG_EXP = Pattern.compile("^-{2}\\s*(?<desc>.+)\\s*$");
     private static final Pattern TABLE_REG_EXP = Pattern.compile("^CREATE\\s+TABLE\\s+(?<scheme>[A-Za-z_]+).(?<name>[A-Za-z_0-9]+)\\s*\\($", Pattern.CASE_INSENSITIVE);
     private static final Pattern INDEX_REG_EXP = Pattern.compile("^CREATE\\s+(?:UNIQUE)?\\s*INDEX\\s+(?<scheme>[A-Za-z_]+).(?<name>[A-Za-z_]+)\\s+ON\\s+(?<tablescheme>[A-Za-z_]+).(?<table>[A-Za-z_0-9]+)\\s+.*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern PRIMARY_KEY_REG_EXP = Pattern.compile("^CONSTRAINT\\s+(?<name>[A-Za-z_]+)\\s+PRIMARY\\s+KEY\\s+\\((?<columns>[A-Za-z_, ]+)\\)$", Pattern.CASE_INSENSITIVE);

@@ -87,7 +87,8 @@ class DbZosTest {
     static Stream<Arguments> indexLinesProvider() {
         return Stream.of(
                 arguments("CREATE  UNIQUE INDEX MSK.I_VALIDATION ON MSK.VALIDATION (DOC_ID, VT_ID);", "MSK", "I_VALIDATION"),
-                arguments("CREATE INDEX  MSK.I_VL_VT ON MSK.VALIDATION (VT_ID);", "MSK", "I_VL_VT")
+                arguments("CREATE INDEX  MSK.I_VL_VT ON MSK.VALIDATION (VT_ID);", "MSK", "I_VL_VT"),
+                arguments("CREATE  INDEX MSK.I_RPA_APP ON MSK.REFUND_PAY_APPENDIX(APP_ID);", "MSK", "I_RPA_APP")
         );
     }
 

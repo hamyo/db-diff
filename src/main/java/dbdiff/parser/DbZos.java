@@ -1,10 +1,10 @@
 package dbdiff.parser;
+
 import dbdiff.domain.db.*;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -15,11 +15,21 @@ public class DbZos implements ModelParser {
     private static final Pattern TABLE_DESC_REG_EXP = Pattern.compile("^-{2}\\s*(?<desc>.+)\\s*:\\s*(?<tablespace>[A-Za-z]+)$");
     private static final Pattern COLUMN_DESC_REG_EXP = Pattern.compile("^-{2}\\s*(?<desc>.+)\\s*$");
     private static final Pattern TABLE_REG_EXP = Pattern.compile("^CREATE\\s+TABLE\\s+(?<scheme>[A-Za-z_]+).(?<name>[A-Za-z_0-9]+)\\s*\\($", Pattern.CASE_INSENSITIVE);
-    private static final Pattern INDEX_REG_EXP = Pattern.compile("^CREATE\\s+(?:UNIQUE)?\\s*INDEX\\s+(?<scheme>[A-Za-z_]+).(?<name>[A-Za-z_]+)\\s+ON\\s+(?<tablescheme>[A-Za-z_]+).(?<table>[A-Za-z_0-9]+)\\s+.*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern INDEX_REG_EXP = Pattern.compile("^CREATE\\s+(?:UNIQUE)?\\s*INDEX\\s+(?<scheme>[A-Za-z_]+).(?<name>[A-Za-z_]+)\\s+ON\\s+(?<tablescheme>[A-Za-z_]+).(?<table>[A-Za-z_0-9]+)[ (]{1}.*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern PRIMARY_KEY_REG_EXP = Pattern.compile("^CONSTRAINT\\s+(?<name>[A-Za-z_]+)\\s+PRIMARY\\s+KEY\\s+\\((?<columns>[A-Za-z_, ]+)\\)$", Pattern.CASE_INSENSITIVE);
     private static final Pattern FOREIGN_KEY_REG_EXP = Pattern.compile("^ALTER\\s+TABLE\\s+(?<scheme>[A-Za-z_]+).(?<tablename>[A-Za-z_0-9]+)\\s+ADD\\s+CONSTRAINT\\s+(?<name>[A-Za-z_0-9]+)\\s+FOREIGN\\s+KEY.*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern COLUMN_REG_EXP = Pattern.compile("^(?<name>[A-Za-z_]+)\\s+.*$");
-
+    private static final Pattern SCHEMA_REG_EXP = Pattern.compile("^set\\s+current\\s+schema\\s+[A-Za-z_0-9]+\\s*;$");
+    private static final Set<String> ENABLE_DATA_TYPES = new HashSet<>(Arrays.asList(
+            // String data types
+            "CLOB", "BLOB", "DBCLOB", "CHARACTER", "VARCHAR", "GRAPHIC", "VARGRAPHIC", "BINARY", "VARBINARY",
+            // Numeric data types
+            "SMALLINT", "INTEGER", "INT", "BIGINT", "DECIMAL", "DEC", "NUMERIC", "DECFLOAT", "REAL", "DOUBLE",
+            // Date, time, and timestamp data types
+            "DATE", "TIME", "TIMESTAMP",
+            // Xml
+            "XML"
+    ));
 
     public List<DatabaseObject> parse(Stream<String> lines) {
         return lines.map(String::trim)
@@ -32,11 +42,17 @@ public class DbZos implements ModelParser {
 
     /**
      * Match's order is important
+     *
      * @param line
      * @return
      */
     Optional<DatabaseObject> handleOne(String line) {
-        Matcher match = TABLE_DESC_REG_EXP.matcher(line);
+        Matcher match = SCHEMA_REG_EXP.matcher(line);
+        if (match.matches()) {
+            return Optional.empty();
+        }
+
+        match = TABLE_DESC_REG_EXP.matcher(line);
         if (match.matches()) {
             return Optional.of(Table.ofDesc(match.group("desc").trim(), match.group("tablespace").trim()));
         }
@@ -98,6 +114,13 @@ public class DbZos implements ModelParser {
             type.setLength(type.length() - 1);
         }
 
-        return Optional.of(Column.ofName(name, type.toString()));
+        String fullType = type.toString();
+        return isColumnTypeEnable(fullType) ? Optional.of(Column.ofName(name, fullType)) : Optional.empty();
+    }
+
+    private boolean isColumnTypeEnable(@NonNull String type) {
+        int brPos = type.indexOf("(");
+        String typeOnly = brPos == -1 ? type : type.substring(0, brPos);
+        return ENABLE_DATA_TYPES.contains(typeOnly.toUpperCase());
     }
 }

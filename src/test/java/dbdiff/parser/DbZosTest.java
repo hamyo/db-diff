@@ -20,9 +20,10 @@ class DbZosTest {
         return Stream.of(
                 arguments("CAF_CODE VARCHAR(500) NOT NULL    ,", "CAF_CODE", "VARCHAR(500)"),
                 arguments("ML_ID BIGINT NOT NULL   GENERATED ALWAYS AS IDENTITY ,", "ML_ID", "BIGINT"),
-                arguments("PAY_SUM DECIMAL(10, 2) NOT NULL    ,", "PAY_SUM", "DECIMAL(10, 2)"),
+                arguments("PAY_SUM DECIMAL(10, 2) NOT NULL    ,", "PAY_SUM", "DECIMAL(10,2)"),
                 arguments("PF_CREATION_DATE   TIMESTAMP,", "PF_CREATION_DATE", "TIMESTAMP"),
-                arguments("PAY_SUM DECIMAL(10, 2),", "PAY_SUM", "DECIMAL(10, 2)")
+                arguments("PAY_SUM DECIMAL(10,2),", "PAY_SUM", "DECIMAL(10,2)"),
+                arguments("APP_PHONE_CODE				VARCHAR(60)", "APP_PHONE_CODE", "VARCHAR(60)")
         );
     }
 

@@ -2,6 +2,7 @@ package dbdiff.parser;
 import dbdiff.domain.db.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -17,7 +18,7 @@ public class DbZos implements ModelParser {
     private static final Pattern INDEX_REG_EXP = Pattern.compile("^CREATE\\s+(?:UNIQUE)?\\s*INDEX\\s+(?<scheme>[A-Za-z_]+).(?<name>[A-Za-z_]+)\\s+ON\\s+(?<tablescheme>[A-Za-z_]+).(?<table>[A-Za-z_0-9]+)\\s+.*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern PRIMARY_KEY_REG_EXP = Pattern.compile("^CONSTRAINT\\s+(?<name>[A-Za-z_]+)\\s+PRIMARY\\s+KEY\\s+\\((?<columns>[A-Za-z_, ]+)\\)$", Pattern.CASE_INSENSITIVE);
     private static final Pattern FOREIGN_KEY_REG_EXP = Pattern.compile("^ALTER\\s+TABLE\\s+(?<scheme>[A-Za-z_]+).(?<tablename>[A-Za-z_0-9]+)\\s+ADD\\s+CONSTRAINT\\s+(?<name>[A-Za-z_0-9]+)\\s+FOREIGN\\s+KEY.*$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern COLUMN_REG_EXP = Pattern.compile("^(?<name>[A-Za-z_]+)\\s+(?<type>[A-Za-z_0-9]+\\(?[0-9, ]*\\)?).*,{1}$");
+    private static final Pattern COLUMN_REG_EXP = Pattern.compile("^(?<name>[A-Za-z_]+)\\s+.*$");
 
 
     public List<DatabaseObject> parse(Stream<String> lines) {
@@ -67,9 +68,36 @@ public class DbZos implements ModelParser {
 
         match = COLUMN_REG_EXP.matcher(line);
         if (match.matches()) {
-            return Optional.of(Column.ofName(match.group("name").trim(), match.group("type").trim()));
+            return handleColumn(line);
         }
 
         return Optional.empty();
+    }
+
+    private Optional<DatabaseObject> handleColumn(String line) {
+        String[] parts = line.split("\\s+");
+        // Column name and type not specified
+        if (parts.length < 2) {
+            return Optional.empty();
+        }
+
+        String name = parts[0].trim();
+        StringBuilder type = new StringBuilder(parts[1]);
+        if (parts[1].contains("(") && !parts[1].contains(")") && parts.length > 2) {
+            for (int i = 2; i < parts.length; i++) {
+                String part = parts[i];
+                type.append(part);
+                if (part.contains(")")) {
+                    break;
+                }
+            }
+
+        }
+
+        if (type.lastIndexOf(",") == type.length() - 1) {
+            type.setLength(type.length() - 1);
+        }
+
+        return Optional.of(Column.ofName(name, type.toString()));
     }
 }

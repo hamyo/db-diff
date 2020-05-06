@@ -13,6 +13,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STNumberFormat;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.text.MessageFormat;
@@ -21,13 +22,12 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class WordReport implements ReportCreater {
-    private final String filePath;
     private final static String CREATED_TABLE_TEXT = "Новые таблицы:";
     private final static String EDITED_TABLE_TEXT = "Измененные таблицы:";
 
     @SneakyThrows
     @Override
-    public void createAndSave(List<Difference> diff) {
+    public byte[] create(List<Difference> diff) {
         XWPFDocument report = new XWPFDocument();
         List<Difference> differences = diff.stream()
                 .filter(one -> StateChange.CREATION == one.getState())
@@ -38,10 +38,9 @@ public class WordReport implements ReportCreater {
                 .filter(one -> StateChange.EDITING == one.getState())
                 .collect(Collectors.toList());
         handleDifferences(differences, report, EDITED_TABLE_TEXT);
-
-        try (FileOutputStream out = new FileOutputStream(filePath)) {
-            report.write(out);
-        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        report.write(baos);
+        return baos.toByteArray();
     }
 
     private void handleDifferences(List<Difference> diff, XWPFDocument report, String title) {

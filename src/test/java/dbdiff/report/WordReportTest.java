@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class WordReportTest {
     private WordReport report;
 
@@ -60,6 +58,6 @@ class WordReportTest {
         editTable.getColumns().add(col);
         diff.add(Difference.ofNew(newTable));
 
-        report.createAndSave(diff);
+        report.create(diff);
     }
 }

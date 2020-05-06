@@ -3,6 +3,7 @@ package dbdiff;
 import dbdiff.domain.conf.Config;
 import dbdiff.parser.DbZos;
 import dbdiff.report.WordReport;
+import dbdiff.saver.LocalFileSaver;
 import dbdiff.service.Comparator;
 import dbdiff.service.DbFormer;
 import lombok.SneakyThrows;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,8 @@ public class Application {
     public static void main(String[] args) {
         try {
             Config config = getConfig(args);
-            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), new WordReport(config.getReportPath()), config);
+            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), new WordReport(),
+                    Collections.singletonList(new LocalFileSaver(config.getReportPath())), config);
             comparator.run();
         } catch (Exception e) {
             log.error("Critical error.", e);

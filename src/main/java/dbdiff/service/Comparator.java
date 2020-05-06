@@ -5,6 +5,7 @@ import dbdiff.domain.db.*;
 import dbdiff.domain.diff.Difference;
 import dbdiff.parser.ModelParser;
 import dbdiff.report.ReportCreater;
+import dbdiff.saver.ReportSaver;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -22,13 +23,15 @@ public class Comparator {
     private final ModelParser parser;
     private final DbFormer dbFormer;
     private final ReportCreater reportCreater;
+    private List<ReportSaver> savers;
     private final Config config;
 
     public void run() {
         Database old = formDb(config.getModels().getOld());
         Database current = formDb(config.getModels().getCurrent());
         List<Difference> diff = compare(old, current);
-        reportCreater.createAndSave(diff);
+        byte[] report = reportCreater.create(diff);
+        savers.forEach(saver -> saver.save(report));
     }
 
     @SneakyThrows

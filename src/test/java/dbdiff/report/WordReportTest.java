@@ -14,7 +14,7 @@ class WordReportTest {
 
     @BeforeEach
     void init() {
-        report = new WordReport("report.docx");
+        report = new WordReport();
     }
 
     @Test

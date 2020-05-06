@@ -6,9 +6,11 @@ import dbdiff.domain.diff.Difference;
 import dbdiff.domain.diff.StateChange;
 import dbdiff.parser.DbZos;
 import dbdiff.report.WordReport;
+import dbdiff.saver.LocalFileSaver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,7 +22,8 @@ class ComparatorTest {
 
     @BeforeEach
     void init() {
-        comparator = new Comparator(new DbZos(), new DbFormer(), new WordReport(""), new Config());
+        comparator = new Comparator(new DbZos(), new DbFormer(), new WordReport(),
+                Collections.singletonList(new LocalFileSaver("report.docx")), new Config());
     }
 
     @Test

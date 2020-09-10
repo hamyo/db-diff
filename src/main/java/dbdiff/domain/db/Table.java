@@ -2,17 +2,21 @@ package dbdiff.domain.db;
 
 import dbdiff.utils.Strings;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@ToString
 public class Table implements DatabaseObject {
     String tablespace;
     String scheme;
     String name;
     String desc;
+    @ToString.Exclude
     List<Column> columns = new ArrayList<>();
+    @ToString.Exclude
     List<Index> indices = new ArrayList<>();
 
     PrimaryKey primaryKey;

@@ -2,9 +2,11 @@ package dbdiff.domain.db;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
+@ToString
 public class ForeignKey extends Constraint {
     String type = "CONSTRAINT";
 

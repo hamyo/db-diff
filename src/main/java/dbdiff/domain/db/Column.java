@@ -2,8 +2,10 @@ package dbdiff.domain.db;
 
 import dbdiff.utils.Strings;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Column implements DatabaseObject {
     private String name;
     private String type;

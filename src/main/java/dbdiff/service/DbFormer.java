@@ -41,13 +41,18 @@ public class DbFormer {
     private void handlePrimaryKey(PrimaryKey pKey, Database db) {
         getLastTable(db).ifPresentOrElse(lastTable -> {
                     if (lastTable.getPrimaryKey() != null) {
-                        throw new UndefinedBehaviorException(pKey.toString());
+                        throw new UndefinedBehaviorException(
+                                String.format(
+                                        "Could not determine %s because the current table %s already has a primary key %s",
+                                        pKey.toString(),
+                                        lastTable.getName(),
+                                        lastTable.getPrimaryKey().getName()));
                     } else {
                         lastTable.setPrimaryKey(pKey);
                     }
                 },
                 () -> {
-                    throw new UndefinedBehaviorException(pKey.toString());
+                    throw new UndefinedBehaviorException(String.format("Could not determine %s because current table was not found", pKey.toString()));
                 });
     }
 

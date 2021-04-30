@@ -18,7 +18,7 @@ public class DbZos implements ModelParser {
     private static final Pattern INDEX_REG_EXP = Pattern.compile("^CREATE\\s+(?:UNIQUE)?\\s*INDEX\\s+(?<scheme>[A-Za-z_]+).(?<name>[A-Za-z_]+)\\s+ON\\s+(?<tablescheme>[A-Za-z_]+).(?<table>[A-Za-z_0-9]+)[ (]{1}.*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern PRIMARY_KEY_REG_EXP = Pattern.compile("^CONSTRAINT\\s+(?<name>[A-Za-z_]+)\\s+PRIMARY\\s+KEY\\s+\\((?<columns>[A-Za-z_, ]+)\\)$", Pattern.CASE_INSENSITIVE);
     private static final Pattern FOREIGN_KEY_REG_EXP = Pattern.compile("^ALTER\\s+TABLE\\s+(?<scheme>[A-Za-z_]+).(?<tablename>[A-Za-z_0-9]+)\\s+ADD\\s+CONSTRAINT\\s+(?<name>[A-Za-z_0-9]+)\\s+FOREIGN\\s+KEY.*$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern COLUMN_REG_EXP = Pattern.compile("^(?<name>[A-Za-z_]+)\\s+.*$");
+    private static final Pattern COLUMN_REG_EXP = Pattern.compile("^(?<name>[A-Za-z_0-9]+)\\s+.*$");
     private static final Pattern SCHEMA_REG_EXP = Pattern.compile("^set\\s+current\\s+schema\\s+[A-Za-z_0-9]+\\s*;$");
     private static final Set<String> ENABLE_DATA_TYPES = new HashSet<>(Arrays.asList(
             // String data types

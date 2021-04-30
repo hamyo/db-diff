@@ -23,7 +23,8 @@ class DbZosTest {
                 arguments("PAY_SUM DECIMAL(10, 2) NOT NULL    ,", "PAY_SUM", "DECIMAL(10,2)"),
                 arguments("PF_CREATION_DATE   TIMESTAMP,", "PF_CREATION_DATE", "TIMESTAMP"),
                 arguments("PAY_SUM DECIMAL(10,2),", "PAY_SUM", "DECIMAL(10,2)"),
-                arguments("APP_PHONE_CODE				VARCHAR(60)", "APP_PHONE_CODE", "VARCHAR(60)")
+                arguments("APP_PHONE_CODE				VARCHAR(60)", "APP_PHONE_CODE", "VARCHAR(60)"),
+                arguments("AN21_ID                   BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,", "AN21_ID", "BIGINT")
         );
     }
 

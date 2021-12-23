@@ -8,6 +8,7 @@ import dbdiff.report.ReportCreater;
 import dbdiff.saver.ReportSaver;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
 
 @AllArgsConstructor
+@Slf4j
 public class Comparator {
     private final ModelParser parser;
     private final DbFormer dbFormer;
@@ -36,14 +38,18 @@ public class Comparator {
 
     @SneakyThrows
     private Database formDb(String path) {
+        log.info("form database structure started {}", path);
         List<DatabaseObject> objects = parser.parse(Files.lines(Paths.get(path), StandardCharsets.UTF_8));
-        return dbFormer.form(objects);
+        Database db = dbFormer.form(objects);
+        log.info("form database structure finished {}", path);
+        return db;
     }
 
     List<Difference> compare(Database old, Database current) {
+        log.info("Comparing for two models started");
         Map<String, Table> oldTables = old.getTables().stream()
                 .collect(toMap(Table::getName, Function.identity()));
-        return current.getTables().stream()
+        List<Difference> differences = current.getTables().stream()
                 .map(curTable -> {
                     Table oldTable = oldTables.get(curTable.getName());
                     if (oldTable == null) {
@@ -54,15 +60,19 @@ public class Comparator {
                     }
                 }).filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        log.info("Comparing for two models finished");
+        return differences;
     }
 
     private Optional<Table> compareTable(Table oldTable, Table curTable) {
+        log.debug("Table ({}) comparing started", curTable.getName());
         Table diff = Table.of(oldTable);
 
         diff.getIndices().addAll(compareIndices(oldTable.getIndices(), curTable.getIndices()));
         diff.getForeignKeys().addAll(compareForeignKeys(oldTable.getForeignKeys(), curTable.getForeignKeys()));
         diff.getColumns().addAll(compareColumns(oldTable.getColumns(), curTable.getColumns()));
 
+        log.debug("Table ({}) comparing finished", curTable.getName());
         return diff.isEmpty() ? Optional.empty() : Optional.of(diff);
     }
 

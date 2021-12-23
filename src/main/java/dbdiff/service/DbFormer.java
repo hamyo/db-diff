@@ -3,17 +3,21 @@ package dbdiff.service;
 import dbdiff.domain.AppException;
 import dbdiff.domain.UndefinedBehaviorException;
 import dbdiff.domain.db.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public class DbFormer {
     public Database form(List<DatabaseObject> dbObjects) {
+        log.info("Database's forming from separate objects started");
         Database db = new Database();
         for (DatabaseObject dbObject : dbObjects) {
             handleOne(dbObject, db);
         }
+        log.info("Database's forming from separate objects finished");
         return db;
     }
 

@@ -8,6 +8,7 @@ import dbdiff.domain.diff.Difference;
 import dbdiff.domain.diff.StateChange;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTAbstractNum;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTLvl;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
+@Slf4j
 public class WordReport implements ReportCreater {
     private final static String CREATED_TABLE_TEXT = "Новые таблицы:";
     private final static String EDITED_TABLE_TEXT = "Измененные таблицы:";
@@ -28,6 +30,7 @@ public class WordReport implements ReportCreater {
     @SneakyThrows
     @Override
     public byte[] create(List<Difference> diff) {
+        log.info("Report's creating started");
         XWPFDocument report = new XWPFDocument();
         List<Difference> differences = diff.stream()
                 .filter(one -> StateChange.CREATION == one.getState())
@@ -40,6 +43,7 @@ public class WordReport implements ReportCreater {
         handleDifferences(differences, report, EDITED_TABLE_TEXT);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         report.write(baos);
+        log.info("Report's creating finished");
         return baos.toByteArray();
     }
 

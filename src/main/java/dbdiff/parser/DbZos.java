@@ -32,12 +32,15 @@ public class DbZos implements ModelParser {
     ));
 
     public List<DatabaseObject> parse(Stream<String> lines) {
-        return lines.map(String::trim)
+        log.info("parse started");
+        List<DatabaseObject> dbObjects = lines.map(String::trim)
                 .filter(str -> !str.isEmpty())
                 .map(this::handleOne)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+        log.info("parse finished");
+        return dbObjects;
     }
 
     /**
@@ -47,43 +50,52 @@ public class DbZos implements ModelParser {
      * @return
      */
     Optional<DatabaseObject> handleOne(String line) {
+        log.debug("handle line {}", line);
         Matcher match = SCHEMA_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is set schema");
             return Optional.empty();
         }
 
         match = TABLE_DESC_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is table description");
             return Optional.of(Table.ofDesc(match.group("desc").trim(), match.group("tablespace").trim()));
         }
 
         match = TABLE_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is table");
             return Optional.of(Table.ofName(match.group("scheme").trim(), match.group("name").trim()));
         }
 
         match = FOREIGN_KEY_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is foreign key");
             return Optional.of(new ForeignKey(match.group("name").trim()));
         }
 
         match = INDEX_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is index");
             return Optional.of(new Index(match.group("scheme").trim(), match.group("name").trim()));
         }
 
         match = PRIMARY_KEY_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is primary key");
             return Optional.of(new PrimaryKey(match.group("name").trim()));
         }
 
         match = COLUMN_DESC_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is column description");
             return Optional.of(Column.ofDesc(match.group("desc").trim()));
         }
 
         match = COLUMN_REG_EXP.matcher(line);
         if (match.matches()) {
+            log.debug("Line is column");
             return handleColumn(line);
         }
 

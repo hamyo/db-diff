@@ -29,8 +29,12 @@ public class Application {
     public static void main(String[] args) {
         try {
             Config config = getConfig(args);
-            Comparator comparator = new Comparator(new DbZos(), new DbFormer(), new WordReport(),
-                    Collections.singletonList(new LocalFileSaver(config.getReportPath())), config);
+            Comparator comparator = new Comparator(
+                    new DbZos(),
+                    new DbFormer(),
+                    new WordReport(),
+                    Collections.singletonList(new LocalFileSaver(config.getReportPath())),
+                    config);
             comparator.run();
         } catch (Exception e) {
             log.error("Critical error.", e);

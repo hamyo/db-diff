@@ -48,7 +48,8 @@ task copyResources(dependsOn: 'jar') {
             .listFiles({ file ->
                 file.getName().endsWith(".properties") ||
                         file.getName().endsWith(".csv") || file.getName().endsWith(".xml") ||
-                        file.getName().endsWith(".groovy") || file.getName().endsWith(".yml")
+                        file.getName().endsWith(".groovy") || file.getName().endsWith(".yml") ||
+                        file.getName().endsWith(".bat")
             } as FileFilter)
             .each { f ->
                 def file = new File(libs, f.getName())
